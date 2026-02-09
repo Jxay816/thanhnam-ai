@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KunAI - Premium Assistant</title>
+    <style>
+        :root { --main: #2c3e50; --gold: #f1c40f; --bg: #f4f7f6; --red: #e74c3c; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow: hidden; }
+        .box { background: white; width: 95%; max-width: 450px; padding: 25px; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); text-align: center; position: relative; }
+        h1 { color: var(--main); margin: 0; font-size: 28px; letter-spacing: 1px; }
+        .sub-t { color: #7f8c8d; font-size: 13px; margin-bottom: 20px; }
+        input { width: 100%; padding: 14px; margin: 10px 0; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; outline: none; transition: 0.3s; }
+        input:focus { border-color: var(--main); box-shadow: 0 0 8px rgba(44, 62, 80, 0.1); }
+        button { width: 100%; padding: 14px; background: var(--main); color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; margin-top: 10px; transition: 0.3s; }
+        button:hover { opacity: 0.9; transform: translateY(-1px); }
+        .plus-btn { background: var(--gold); color: #000; border: 1px solid #d4ac0d; }
+        #chat-box { height: 350px; overflow-y: auto; border: 1px solid #f1f1f1; padding: 15px; margin-bottom: 10px; display: none; flex-direction: column; text-align: left; background: #fff; border-radius: 10px; }
+        .msg { margin: 8px 0; padding: 12px; border-radius: 12px; max-width: 85%; font-size: 14px; line-height: 1.5; }
+        .u { align-self: flex-end; background: #3498db; color: white; border-bottom-right-radius: 2px; }
+        .b { align-self: flex-start; background: #f1f3f5; color: #333; border-bottom-left-radius: 2px; }
+        .modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 25px; border-radius: 20px; box-shadow: 0 0 100px rgba(0,0,0,0.4); z-index: 1000; width: 85%; max-width: 380px; }
+        #status-bar { font-size: 12px; margin-bottom: 8px; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="box">
+    <h1>Thanh Nam</h1>
+    <p class="sub-t">Sức mạnh AI trong tầm tay ngài</p>
+
+    <div id="auth-part">
+        <input type="text" id="user" placeholder="Tên đăng nhập">
+        <input type="password" id="pass" placeholder="Mật khẩu">
+        <button onclick="handleAuth('login')">ĐĂNG NHẬP</button>
+        <button onclick="handleAuth('reg')" style="background: #bdc3c7;">ĐĂNG KÝ MIỄN PHÍ</button>
+    </div>
+
+    <div id="chat-part" style="display:none;">
+        <div id="status-bar"></div>
+        <div id="chat-box"></div>
+        <div style="display:flex; gap: 5px;">
+            <input type="text" id="msg-input" placeholder="Hỏi KunAI..." style="margin:0;">
+            <button onclick="askKunAI()" style="width: 80px; margin:0;">GỬI</button>
+        </div>
+        <button class="plus-btn" onclick="showPlus()">NÂNG CẤP KUNAI PLUS ✨</button>
+    </div>
+</div>
+
+<div id="plus-modal" class="modal">
+    <h3 style="color: #d4ac0d; margin-top:0;">💎 KunAI PLUS</h3>
+    <p style="font-size: 14px; color: #2c3e50;">Mở khóa vô hạn tin nhắn và tốc độ cao hơn.</p>
+    <div style="text-align: left; background: #fdfaf0; padding: 15px; border-radius: 12px; font-size: 14px; border: 1px solid #f9e79f;">
+        <p>🏦 <b>Ví:</b> Zalo Pay</p>
+        <p>🔢 <b>SĐT:</b> 0965658978</p>
+        <p>📝 <b>Nội dung:</b> <span id="bill-code" style="color: #e74c3c; font-weight: bold; font-size: 16px;"></span></p>
+    </div>
+    <button onclick="this.parentElement.style.display='none'" style="background:#bdc3c7;">ĐÓNG</button>
+</div>
+
+<script>
+    const DB = "https://c2-premium-default-rtdb.firebaseio.com/";
+    const KEY = "AIzaSyD5ndz8VHowBFoeh0kslesF5uLmLq1WrkE";
+    let curUser = "", userIP = "", isPlus = false;
+
+    async function init() {
+        const res = await fetch('https://api.ipify.org?format=json');
+        const data = await res.json();
+        userIP = data.ip.replace(/\./g, '_');
+        
+        const banCheck = await fetch(`${DB}/BannedIPs/${userIP}.json`);
+        if (await banCheck.json()) {
+            document.body.innerHTML = "<div style='text-align:center; padding:50px;'><h2 style='color:red;'>TRUY CẬP BỊ TỪ CHỐI!</h2><p>IP của ngài đã bị khóa bởi Admin.</p></div>";
+        }
+    }
+
+    async function handleAuth(type) {
+        const u = document.getElementById('user').value.trim();
+        const p = document.getElementById('pass').value.trim();
+        if(!u || !p) return alert("Vui lòng điền đủ thông tin!");
+
+        if(type === 'reg') {
+            const ipUsed = await fetch(`${DB}/UsedIPs/${userIP}.json`);
+            if (await ipUsed.json()) {
+                alert("IP này đã có tài khoản! Hệ thống tự động khóa IP nếu cố tình clone.");
+                await fetch(`${DB}/BannedIPs/${userIP}.json`, { method: 'PUT', body: JSON.stringify(true) });
+                location.reload(); return;
+            }
+            const res = await fetch(`${DB}/accounts/${u}.json`);
+            if(await res.json()) return alert("Tên này có người dùng rồi!");
+
+            await fetch(`${DB}/accounts/${u}.json`, { method: 'PUT', body: JSON.stringify({pass: p, isPlus: false, msgCount: 0}) });
+            await fetch(`${DB}/UsedIPs/${userIP}.json`, { method: 'PUT', body: JSON.stringify(u) });
+            alert("Đăng ký thành công! Hãy đăng nhập.");
+        } else {
+            const res = await fetch(`${DB}/accounts/${u}.json`);
+            const data = await res.json();
+            if(!data || data.pass !== p) return alert("Sai tài khoản hoặc mật khẩu!");
+            
+            curUser = u; isPlus = data.isPlus;
+            document.getElementById('auth-part').style.display = 'none';
+            document.getElementById('chat-part').style.display = 'block';
+            document.getElementById('chat-box').style.display = 'flex';
+            updateStatus(data.msgCount);
+        }
+    }
+
+    function updateStatus(count) {
+        const bar = document.getElementById('status-bar');
+        if(isPlus) { bar.innerText = "⭐ Gói: PLUS (Vô hạn)"; bar.style.color = "#d4ac0d"; }
+        else { bar.innerText = `📊 Gói: FREE (${count}/10 tin)`; bar.style.color = "#7f8c8d"; }
+    }
+
+    async function askKunAI() {
+        const accRes = await fetch(`${DB}/accounts/${curUser}.json`);
+        const accData = await accRes.json();
+        if (!accData.isPlus && accData.msgCount >= 10) return alert("Hết lượt miễn phí! Hãy nâng cấp PLUS.");
+
+        const inp = document.getElementById('msg-input');
+        const txt = inp.value.trim();
+        if(!txt) return;
+
+        const box = document.getElementById('chat-box');
+        box.innerHTML += `<div class="msg u">${txt}</div>`;
+        inp.value = ""; box.scrollTop = box.scrollHeight;
+
+        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${KEY}`, {
+            method: 'POST',
+            body: JSON.stringify({ contents: [{ parts: [{ text: txt }] }] })
+        });
+        const d = await res.json();
+        const ans = d.candidates[0].content.parts[0].text;
+
+        box.innerHTML += `<div class="msg b"><b>KunAI:</b> ${ans}</div>`;
+        box.scrollTop = box.scrollHeight;
+
+        const newCount = (accData.msgCount || 0) + 1;
+        await fetch(`${DB}/accounts/${curUser}/msgCount.json`, { method: 'PUT', body: JSON.stringify(newCount) });
+        updateStatus(newCount);
+        fetch(`${DB}/users/${curUser}/history.json`, { method: 'POST', body: JSON.stringify({q: txt, a: ans, time: new Date().toLocaleString()}) });
+    }
+
+    function showPlus() {
+        document.getElementById('bill-code').innerText = "KUNAI_" + curUser.toUpperCase() + "_" + Math.floor(1000 + Math.random() * 8999);
+        document.getElementById('plus-modal').style.display = 'block';
+    }
+    init();
+</script>
+</body>
+          </html>
+  
