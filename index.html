@@ -2,81 +2,91 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KunAI - Intelligent Assistant</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>KunAI - Premium Interface</title>
     <style>
-        :root { --main: #007aff; --bg: #f2f2f7; --white: #ffffff; }
-        body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); margin: 0; display: flex; justify-content: center; height: 100vh; overflow: hidden; }
-        .app { width: 100%; max-width: 450px; background: var(--white); display: flex; flex-direction: column; box-shadow: 0 0 20px rgba(0,0,0,0.05); }
+        :root { --primary: #007aff; --accent: #5856d6; --bg: #0f172a; --card: #1e293b; --text: #f8fafc; }
+        body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0; display: flex; justify-content: center; height: 100vh; overflow: hidden; }
+        .app-container { width: 100%; max-width: 480px; background: var(--card); display: flex; flex-direction: column; position: relative; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); }
         
-        .header { padding: 15px; border-bottom: 1px solid #efefef; display: flex; justify-content: space-between; align-items: center; }
-        .header h2 { margin: 0; font-size: 18px; color: var(--main); font-weight: 700; }
-        .logout { color: #ff3b30; font-size: 14px; cursor: pointer; font-weight: 500; }
+        /* Header */
+        .header { padding: 20px; background: rgba(30, 41, 59, 0.8); backdrop-filter: blur(10px); display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .header h2 { margin: 0; font-size: 22px; background: linear-gradient(90deg, #007aff, #5856d6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800; }
+        .btn-out { font-size: 12px; padding: 6px 12px; border: 1px solid #ef4444; color: #ef4444; border-radius: 8px; cursor: pointer; transition: 0.3s; }
+        .btn-out:hover { background: #ef4444; color: white; }
 
-        #auth-part { padding: 40px 20px; flex: 1; display: flex; flex-direction: column; justify-content: center; }
-        input { padding: 15px; margin-bottom: 12px; border: 1px solid #ddd; border-radius: 12px; font-size: 16px; outline: none; transition: 0.2s; }
-        input:focus { border-color: var(--main); }
-        button { padding: 15px; background: var(--main); color: #fff; border: none; border-radius: 12px; font-weight: 600; cursor: pointer; font-size: 16px; }
-        .reg-link { text-align: center; color: #8e8e93; margin-top: 20px; font-size: 14px; cursor: pointer; }
+        /* Auth Part */
+        #auth-part { padding: 40px 30px; flex: 1; display: flex; flex-direction: column; justify-content: center; text-align: center; }
+        .logo-main { font-size: 50px; margin-bottom: 10px; font-weight: 900; letter-spacing: -2px; }
+        input { background: #334155; border: 1px solid #475569; padding: 15px; border-radius: 12px; color: white; margin-bottom: 15px; font-size: 16px; outline: none; transition: 0.3s; }
+        input:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(0,122,255,0.2); }
+        button.primary-btn { background: linear-gradient(135deg, var(--primary), var(--accent)); color: white; border: none; padding: 16px; border-radius: 12px; font-weight: 700; font-size: 16px; cursor: pointer; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3); }
+        .sub-link { color: #94a3b8; margin-top: 20px; cursor: pointer; font-size: 14px; }
 
+        /* Chat Part */
         #chat-part { display: none; flex-direction: column; flex: 1; overflow: hidden; }
-        #chat-box { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 12px; background: #fff; }
-        .msg { padding: 10px 16px; border-radius: 20px; max-width: 80%; font-size: 15px; line-height: 1.5; word-wrap: break-word; }
-        .u { align-self: flex-end; background: var(--main); color: #fff; border-bottom-right-radius: 4px; }
-        .b { align-self: flex-start; background: #e9e9eb; color: #000; border-bottom-left-radius: 4px; }
+        #chat-box { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; scroll-behavior: smooth; }
+        .msg { padding: 12px 16px; border-radius: 18px; max-width: 85%; line-height: 1.5; font-size: 15px; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .u { align-self: flex-end; background: var(--primary); color: white; border-bottom-right-radius: 4px; }
+        .b { align-self: flex-start; background: #334155; color: white; border-bottom-left-radius: 4px; border: 1px solid rgba(255,255,255,0.05); }
 
-        .input-area { padding: 15px; border-top: 1px solid #efefef; display: flex; gap: 10px; background: #fff; }
-        .input-area input { flex: 1; margin: 0; }
-        .input-area button { padding: 0 20px; }
+        /* Plus UI */
+        .plus-status { padding: 10px; background: rgba(245, 158, 11, 0.1); border-top: 1px solid rgba(245, 158, 11, 0.2); text-align: center; font-size: 12px; }
+        .btn-plus { color: #f59e0b; font-weight: 800; text-decoration: underline; cursor: pointer; margin-left: 5px; }
 
-        .plus-bar { padding: 10px; background: #fffbe6; text-align: center; border-top: 1px solid #ffe58f; font-size: 13px; color: #856404; }
-        .plus-link { color: #b7860b; font-weight: 700; cursor: pointer; text-decoration: underline; }
+        /* Input Area */
+        .input-group { padding: 20px; background: var(--card); border-top: 1px solid rgba(255,255,255,0.1); display: flex; gap: 10px; }
+        .input-group input { flex: 1; margin: 0; background: #0f172a; }
 
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 100; align-items: center; justify-content: center; }
-        .modal-content { background: #fff; width: 85%; max-width: 320px; padding: 25px; border-radius: 20px; text-align: center; }
-        .bank-info { background: #f8f8f8; padding: 15px; border-radius: 12px; margin: 15px 0; border: 1px dashed #bbb; font-family: monospace; font-size: 14px; text-align: left; }
+        /* Modal */
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 99; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+        .modal-content { background: var(--card); width: 85%; max-width: 350px; padding: 30px; border-radius: 24px; border: 1px solid rgba(255,255,255,0.1); text-align: center; }
+        .bill-card { background: #0f172a; padding: 20px; border-radius: 16px; margin: 20px 0; border: 1px dashed var(--primary); text-align: left; }
     </style>
 </head>
 <body>
 
-<div class="app">
+<div class="app-container">
     <div id="auth-part">
-        <h1 style="text-align:center; margin-bottom:40px; color:#1c1c1e;">KunAI</h1>
-        <input type="text" id="user" placeholder="Tên đăng nhập">
-        <input type="password" id="pass" placeholder="Mật khẩu">
-        <button onclick="handleAuth('login')">Đăng nhập</button>
-        <div class="reg-link" onclick="handleAuth('reg')">Tạo tài khoản mới (Giới hạn 3 acc/IP)</div>
+        <div class="logo-main">KunAI</div>
+        <p style="color:#94a3b8; margin-bottom: 30px;">Intelligence Experience</p>
+        <input type="text" id="user" placeholder="Username">
+        <input type="password" id="pass" placeholder="Password">
+        <button class="primary-btn" onclick="handleAuth('login')">LOGIN</button>
+        <div class="sub-link" onclick="handleAuth('reg')">Tạo tài khoản mới (Giới hạn 3 acc/IP)</div>
     </div>
 
     <div id="chat-part">
         <div class="header">
             <h2 id="header-name">KunAI</h2>
-            <div class="logout" onclick="location.reload()">Đăng xuất</div>
+            <div class="btn-out" onclick="location.reload()">LOGOUT</div>
         </div>
         <div id="chat-box"></div>
-        <div class="plus-bar">
-            <span id="limit-txt">Gói Free: 0/10</span> | 
-            <span class="plus-link" onclick="openPlus()">Nâng cấp Plus ✨</span>
+        <div class="plus-status">
+            <span id="limit-txt">Gói Miễn Phí: 0/10</span> | 
+            <span class="btn-plus" onclick="openPlus()">NÂNG CẤP PLUS ✨</span>
         </div>
-        <div class="input-area">
-            <input type="text" id="msg-input" placeholder="Hỏi KunAI...">
-            <button onclick="askAI()">Gửi</button>
+        <div class="input-group">
+            <input type="text" id="msg-input" placeholder="Hỏi gì đó..." onkeypress="if(event.key==='Enter') askAI()">
+            <button class="primary-btn" style="padding: 0 20px;" onclick="askAI()">GỬI</button>
         </div>
     </div>
 </div>
 
 <div id="plus-modal" class="modal" onclick="this.style.display='none'">
     <div class="modal-content" onclick="event.stopPropagation()">
-        <h3 style="margin:0 0 10px 0;">Nâng cấp KunAI PLUS</h3>
-        <p style="font-size: 14px; color: #666;">Chuyển khoản qua ZaloPay:</p>
-        <div class="bank-info">
-            STK: 0965658978<br>
-            Nội dung: <span id="bill-code" style="color:red; font-weight:bold;"></span>
+        <h2 style="margin:0;">Nâng Cấp PLUS</h2>
+        <div class="bill-card">
+            <p style="margin:0; color:#94a3b8; font-size:12px;">ZALO PAY</p>
+            <p style="margin:5px 0; font-weight:bold; font-size:18px;">0965658978</p>
+            <p style="margin:10px 0 0 0; color:#94a3b8; font-size:12px;">NỘI DUNG CK:</p>
+            <p id="bill-code" style="margin:5px 0; color:#007aff; font-weight:bold;"></p>
         </div>
-        <p style="font-size: 12px; color: #ff3b30; font-weight: 700; line-height: 1.4;">
-            LƯU Ý: Chụp bill + nội dung gửi qua Zalo: 0586953515 để được Admin duyệt Plus.
+        <p style="color:#ef4444; font-size:13px; font-weight:bold; line-height:1.4;">
+            LƯU Ý: Phải chụp bill + nội dung ck gửi qua Zalo: 0586953515 để được Admin Thanh Nam duyệt Plus.
         </p>
-        <button onclick="document.getElementById('plus-modal').style.display='none'" style="width:100%; background:#f2f2f7; color:#333; margin-top:10px;">Đóng</button>
+        <button class="primary-btn" style="width:100%; margin-top:10px; background:#475569;" onclick="document.getElementById('plus-modal').style.display='none'">ĐÓNG</button>
     </div>
 </div>
 
@@ -91,48 +101,48 @@
             const d = await res.json();
             userIP = d.ip.replace(/\./g, '_');
             const ban = await fetch(`${DB}/BannedIPs/${userIP}.json`);
-            if (await ban.json()) document.body.innerHTML = "<h2 style='text-align:center; padding-top:50px;'>IP của bạn đã bị cấm.</h2>";
+            if (await ban.json()) document.body.innerHTML = "<div style='padding:50px; text-align:center;'><h2>IP BỊ KHÓA</h2></div>";
         } catch(e) {}
     }
 
     async function handleAuth(type) {
         const u = document.getElementById('user').value.trim().toLowerCase();
         const p = document.getElementById('pass').value.trim();
-        if(!u || !p) return alert("Vui lòng điền đủ!");
+        if(!u || !p) return alert("Nhập đủ thông tin!");
 
         if(type === 'reg') {
             const ipRes = await fetch(`${DB}/UsedIPs/${userIP}/count.json`);
             let count = await ipRes.json() || 0;
             if(count >= 3) {
-                alert("Bạn đã tạo quá 3 tài khoản!");
+                alert("IP này đã tạo 3 acc! CẤM IP!");
                 await fetch(`${DB}/BannedIPs/${userIP}.json`, {method:'PUT', body:'true'});
                 return location.reload();
             }
             const check = await fetch(`${DB}/accounts/${u}.json`);
-            if(await check.json()) return alert("Tên này đã tồn tại!");
+            if(await check.json()) return alert("Tên đã tồn tại!");
             await fetch(`${DB}/accounts/${u}.json`, {method:'PUT', body: JSON.stringify({pass:p, isPlus:false, msgCount:0})});
             await fetch(`${DB}/UsedIPs/${userIP}/count.json`, {method:'PUT', body: JSON.stringify(count+1)});
-            alert("Đăng ký thành công!");
+            alert("Đăng ký xong!");
         } else {
             const res = await fetch(`${DB}/accounts/${u}.json`);
             const data = await res.json();
-            if(!data || data.pass !== p) return alert("Sai tài khoản hoặc mật khẩu!");
+            if(!data || data.pass !== p) return alert("Sai tài khoản!");
             curU = u; isPlus = data.isPlus;
             document.getElementById('auth-part').style.display = 'none';
             document.getElementById('chat-part').style.display = 'flex';
-            document.getElementById('header-name').innerText = u;
+            document.getElementById('header-name').innerText = u.toUpperCase();
             updateStatus(data.msgCount);
         }
     }
 
     function updateStatus(count) {
-        document.getElementById('limit-txt').innerText = isPlus ? "Gói: PLUS (Vô hạn)" : `Free: ${count}/10`;
+        document.getElementById('limit-txt').innerText = isPlus ? "Gói: PLUS (Vô Hạn)" : `Free: ${count}/10 tin`;
     }
 
     async function askAI() {
         const resAcc = await fetch(`${DB}/accounts/${curU}.json`);
         const acc = await resAcc.json();
-        if(!acc.isPlus && acc.msgCount >= 10) return alert("Hết lượt miễn phí, hãy nạp Plus!");
+        if(!acc.isPlus && acc.msgCount >= 10) return alert("Hết lượt! Nạp Plus đi.");
 
         const inp = document.getElementById('msg-input');
         const txt = inp.value.trim();
@@ -149,25 +159,16 @@
                 body: JSON.stringify({ contents: [{ parts: [{ text: txt }] }] })
             });
             const d = await apiRes.json();
-            
-            // Fix triệt để lỗi không lấy được text
-            let ans = "";
-            if (d.candidates && d.candidates[0].content && d.candidates[0].content.parts) {
-                ans = d.candidates[0].content.parts[0].text;
-            } else if (d.error) {
-                ans = "Lỗi API: " + d.error.message;
-            } else {
-                ans = "AI đang bận, bạn thử hỏi câu khác nhé!";
-            }
-
+            let ans = (d.candidates && d.candidates[0].content) ? d.candidates[0].content.parts[0].text : "AI đang bận, thử lại sau!";
             box.innerHTML += `<div class="msg b">${ans}</div>`;
-            const newCount = (acc.msgCount || 0) + 1;
-            await fetch(`${DB}/accounts/${curU}/msgCount.json`, {method:'PUT', body: JSON.stringify(newCount)});
-            updateStatus(newCount);
+            
+            if(!isPlus) {
+                const newCount = (acc.msgCount || 0) + 1;
+                await fetch(`${DB}/accounts/${curU}/msgCount.json`, {method:'PUT', body: JSON.stringify(newCount)});
+                updateStatus(newCount);
+            }
             box.scrollTop = box.scrollHeight;
-        } catch(e) {
-            box.innerHTML += `<div class="msg b">Lỗi kết nối. Vui lòng kiểm tra mạng!</div>`;
-        }
+        } catch(e) { box.innerHTML += `<div class="msg b">Lỗi kết nối AI!</div>`; }
     }
 
     function openPlus() {
